@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hala Mobility Inventory</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f4f7f6;color:#17211f}
+header{background:#123d32;color:#fff;padding:18px 22px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:22px;font-weight:800}.brand small{display:block;font-size:11px;font-weight:500;opacity:.75;margin-top:3px}
+nav{display:flex;gap:7px;padding:12px 18px;background:#fff;border-bottom:1px solid #dde5e2;overflow:auto}
+nav button{border:0;background:#eef3f1;padding:10px 14px;border-radius:9px;cursor:pointer;font-weight:700;color:#24433a;white-space:nowrap}
+nav button.active{background:#1f7a5b;color:#fff}
+main{max-width:1250px;margin:22px auto;padding:0 18px}.page{display:none}.page.active{display:block}
+h1{font-size:25px;margin:0 0 18px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:#fff;border:1px solid #dde5e2;border-radius:14px;padding:18px}.label{font-size:12px;color:#71807b}.value{font-size:27px;font-weight:800;margin-top:8px}
+.panel{background:#fff;border:1px solid #dde5e2;border-radius:14px;padding:18px;margin-top:18px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e7ecea;font-size:13px}th{background:#f6f8f7}
+input,select{padding:10px;border:1px solid #cfd9d5;border-radius:8px;width:100%;background:#fff}
+.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.btn{border:0;border-radius:9px;padding:10px 14px;background:#1f7a5b;color:#fff;font-weight:700;cursor:pointer}.btn.secondary{background:#e9efec;color:#25473c}
+.actions{display:flex;gap:8px;margin-top:12px}.pill{padding:5px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#e8f4ef;color:#176348}.low{background:#fff0e8;color:#a34d18}
+@media(max-width:800px){.cards{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr}.panel{overflow:auto}}
+</style>
+</head>
+<body>
+<header><div class="brand">HALA MOBILITY<small>EV Fleet Parts & Maintenance</small></div><div>Inventory V1</div></header>
+<nav id="nav"></nav>
+<main>
+<section id="dashboard" class="page active">
+<h1>Dashboard</h1>
+<div class="cards">
+<div class="card"><div class="label">Total Parts</div><div class="value" id="cParts">0</div></div>
+<div class="card"><div class="label">Low Stock</div><div class="value" id="cLow">0</div></div>
+<div class="card"><div class="label">Open Repairs</div><div class="value" id="cRepairs">0</div></div>
+<div class="card"><div class="label">Stock Value</div><div class="value" id="cValue">₹0</div></div>
+</div>
+<div class="panel"><h3>Quick actions</h3><div class="actions">
+<button class="btn" onclick="showPage('parts')">Add / View Parts</button>
+<button class="btn secondary" onclick="showPage('stock')">Stock Movement</button>
+<button class="btn secondary" onclick="showPage('repairs')">Vehicle Repair</button>
+</div></div>
+</section>
+
+<section id="parts" class="page">
+<h1>Parts Inventory</h1>
+<div class="panel">
+<div class="formgrid">
+<input id="pSku" placeholder="SKU / Part Code">
+<input id="pName" placeholder="Part Name">
+<input id="pCat" placeholder="Category">
+<input id="pLoc" placeholder="Location">
+<input id="pQty" type="number" placeholder="Opening Qty">
+<input id="pMin" type="number" placeholder="Minimum Stock">
+</div><div class="actions"><button class="btn" onclick="addPart()">Add Part</button></div>
+</div>
+<div class="panel"><table><thead><tr><th>SKU</th><th>Part</th><th>Category</th><th>Location</th><th>Qty</th><th>Min</th><th>Status</th></tr></thead><tbody id="partsBody"></tbody></table></div>
+</section>
+
+<section id="stock" class="page">
+<h1>Stock Movement</h1>
+<div class="panel"><div class="formgrid">
+<select id="sPart"></select><select id="sType"><option value="in">Stock In</option><option value="out">Stock Out</option></select>
+<input id="sQty" type="number" min="1" placeholder="Quantity">
+</div><div class="actions"><button class="btn" onclick="moveStock()">Save Movement</button></div></div>
+<div class="panel"><table><thead><tr><th>Date</th><th>SKU</th><th>Type</th><th>Qty</th></tr></thead><tbody id="stockBody"></tbody></table></div>
+</section>
+
+<section id="repairs" class="page">
+<h1>Vehicle Repairs</h1>
+<div class="panel"><div class="formgrid">
+<input id="rVehicle" placeholder="Vehicle Number">
+<select id="rCustomer"><option>3PL</option><option>B2B</option><option>B2C</option></select>
+<input id="rComplaint" placeholder="Complaint / Issue">
+<input id="rTech" placeholder="Technician">
+<select id="rStatus"><option>Open</option><option>In Progress</option><option>Completed</option></select>
+<input id="rCost" type="number" placeholder="Repair Cost ₹">
+</div><div class="actions"><button class="btn" onclick="addRepair()">Create Repair</button></div></div>
+<div class="panel"><table><thead><tr><th>Vehicle</th><th>Customer</th><th>Complaint</th><th>Technician</th><th>Status</th><th>Cost</th></tr></thead><tbody id="repairsBody"></tbody></table></div>
+</section>
+
+<section id="reports" class="page">
+<h1>Reports</h1>
+<div class="panel"><h3>Part-wise stock summary</h3><table><thead><tr><th>SKU</th><th>Part</th><th>Qty</th><th>Stock Value</th></tr></thead><tbody id="reportBody"></tbody></table></div>
+</section>
+</main>
+<script>
+const keys=['parts','movements','repairs'];
+let db=Object.fromEntries(keys.map(k=>[k,JSON.parse(localStorage.getItem('hala_'+k)||'[]')]));
+const save=()=>keys.forEach(k=>localStorage.setItem('hala_'+k,JSON.stringify(db[k])));
+const navItems=[['dashboard','Dashboard'],['parts','Parts Inventory'],['stock','Stock Movement'],['repairs','Vehicle Repairs'],['reports','Reports']];
+document.getElementById('nav').innerHTML=navItems.map(([id,t],i)=>`<button class="${i===0?'active':''}" onclick="showPage('${id}',this)">${t}</button>`).join('');
+function showPage(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');else [...document.querySelectorAll('nav button')].find(x=>x.textContent===navItems.find(n=>n[0]===id)[1])?.classList.add('active');render();}
+function addPart(){let p={sku:pSku.value.trim(),name:pName.value.trim(),cat:pCat.value.trim(),loc:pLoc.value.trim(),qty:+pQty.value||0,min:+pMin.value||0};if(!p.sku||!p.name)return alert('SKU and Part Name are required');db.parts.push(p);save();['pSku','pName','pCat','pLoc','pQty','pMin'].forEach(id=>document.getElementById(id).value='');render();}
+function moveStock(){let sku=sPart.value,q=+sQty.value||0,t=sType.value,p=db.parts.find(x=>x.sku===sku);if(!p||q<1)return alert('Select a part and quantity');if(t==='out'&&p.qty<q)return alert('Insufficient stock');p.qty += t==='in'?q:-q;db.movements.unshift({date:new Date().toLocaleString(),sku,type:t==='in'?'IN':'OUT',qty:q});save();sQty.value='';render();}
+function addRepair(){let r={vehicle:rVehicle.value.trim(),customer:rCustomer.value,complaint:rComplaint.value.trim(),tech:rTech.value.trim(),status:rStatus.value,cost:+rCost.value||0};if(!r.vehicle||!r.complaint)return alert('Vehicle and complaint are required');db.repairs.unshift(r);save();['rVehicle','rComplaint','rTech','rCost'].forEach(id=>document.getElementById(id).value='');render();}
+function render(){partsBody.innerHTML=db.parts.map(p=>`<tr><td>${p.sku}</td><td>${p.name}</td><td>${p.cat}</td><td>${p.loc}</td><td>${p.qty}</td><td>${p.min}</td><td><span class="pill ${p.qty<=p.min?'low':''}">${p.qty<=p.min?'LOW STOCK':'OK'}</span></td></tr>`).join('');sPart.innerHTML=db.parts.map(p=>`<option value="${p.sku}">${p.sku} — ${p.name}</option>`).join('');stockBody.innerHTML=db.movements.map(m=>`<tr><td>${m.date}</td><td>${m.sku}</td><td>${m.type}</td><td>${m.qty}</td></tr>`).join('');repairsBody.innerHTML=db.repairs.map(r=>`<tr><td>${r.vehicle}</td><td>${r.customer}</td><td>${r.complaint}</td><td>${r.tech}</td><td>${r.status}</td><td>₹${r.cost.toLocaleString()}</td></tr>`).join('');reportBody.innerHTML=db.parts.map(p=>`<tr><td>${p.sku}</td><td>${p.name}</td><td>${p.qty}</td><td>₹${(p.qty*(p.price||0)).toLocaleString()}</td></tr>`).join('');cParts.textContent=db.parts.length;cLow.textContent=db.parts.filter(p=>p.qty<=p.min).length;cRepairs.textContent=db.repairs.filter(r=>r.status!=='Completed').length;cValue.textContent='₹'+db.parts.reduce((a,p)=>a+p.qty*(p.price||0),0).toLocaleString();}
+render();
+</script>
+</body></html>
